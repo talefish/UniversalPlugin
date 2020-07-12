@@ -32,59 +32,51 @@ namespace Doffish {
                 AutoSize = false,
                 TextAlign = ContentAlignment.MiddleLeft,
                 Text = plugin.name,
-                Top = this.buttont,
-                Left = this.buttonl,
-                Height = this.buttonh,
-                Width = this.buttonw - 100,
+                Top = buttont,
+                Left = buttonl,
+                Height = buttonh,
+                Width = buttonw - 100,
                 Visible = true
             };
-            control.Click += new EventHandler(this.Plugin_Click);
-            this.toolTip1.SetToolTip(control, plugin.description);
-            this.panel1.Controls.Add(control);
+            control.Click += new EventHandler(Plugin_Click);
+            toolTip1.SetToolTip(control, plugin.description);
+            panel1.Controls.Add(control);
             Label label2 = new Label {
                 Tag = plugin.dictKey,
                 AutoSize = false,
                 TextAlign = ContentAlignment.MiddleRight,
                 Text = plugin.hotkey,
-                Top = this.buttont,
-                Left = this.buttonl + control.Width,
+                Top = buttont,
+                Left = buttonl + control.Width,
                 Width = 100
             };
-            label2.Click += new EventHandler(this.Plugin_Click);
-            this.toolTip1.SetToolTip(label2, plugin.hotkey);
-            this.panel1.Controls.Add(label2);
+            label2.Click += new EventHandler(Plugin_Click);
+            toolTip1.SetToolTip(label2, plugin.hotkey);
+            panel1.Controls.Add(label2);
             Label label3 = new Label {
                 Tag = plugin.dictKey,
                 Name = plugin.dictKey,
                 AutoSize = false,
                 TextAlign = ContentAlignment.MiddleRight,
-                ForeColor = this.GetColor(plugin.verify),
+                ForeColor = GetColor(plugin.verify),
                 Text = plugin.verify,
-                Top = this.buttont,
-                Left = (this.buttonl + control.Width) + 100,
+                Top = buttont,
+                Left = (buttonl + control.Width) + 100,
                 Width = 50
             };
-            label3.Click += new EventHandler(this.Plugin_Click);
-            this.panel1.Controls.Add(label3);
+            label3.Click += new EventHandler(Plugin_Click);
+            panel1.Controls.Add(label3);
             base.ControlBox = true;
-            if ((this.interval * (this.rows - 1)) <= this.buttont) {
-                this.buttonl += this.buttonw + 0x4b;
-                this.buttont -= (this.interval * this.rows) - this.interval;
+            if ((interval * (rows - 1)) <= buttont) {
+                buttonl += buttonw + 0x4b;
+                buttont -= (interval * rows) - interval;
             } else {
-                this.buttont += this.interval;
+                buttont += interval;
             }
         }
 
         private void CloseMenuItem_Click(object sender, EventArgs e) {
-            try {
-                this.panel1.Controls.Clear();
-                this.plugin.Close();
-                this.plugin = null;
-                this.Text = "Plugin";
-                this.PluginVer.Text = "PluginVer";
-                this.GameVer.Text = "GameVer";
-            } catch {
-            }
+            closePlugin();
         }
 
         private void ExitMenuItem_Click(object sender, EventArgs e) {
@@ -92,60 +84,55 @@ namespace Doffish {
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e) {
-            try {
-                this.plugin.Close();
-            } catch (Exception) {
-            }
+            closePlugin();
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e) {
-            try {
-                this.plugin.Close();
-            } catch (Exception) {
-            }
+            closePlugin();
         }
 
         private Color GetColor(string memValue) {
             uint num;
             if (uint.TryParse(memValue, out num)) {
                 if (num > 0) {
-                    return ColorTranslator.FromHtml(this.plugin.actionColor);
+                    return ColorTranslator.FromHtml(plugin.actionColor);
                 }
-                return ColorTranslator.FromHtml(this.plugin.defaultColor);
+                return ColorTranslator.FromHtml(plugin.defaultColor);
             }
             if (memValue == "开启") {
-                return ColorTranslator.FromHtml(this.plugin.actionColor);
+                return ColorTranslator.FromHtml(plugin.actionColor);
             }
-            return ColorTranslator.FromHtml(this.plugin.defaultColor);
+            return ColorTranslator.FromHtml(plugin.defaultColor);
         }
 
 
         private void initPlugin(string profile) {
             try {
-                this.plugin = new Plugin(profile, base.Handle);
+                plugin = new Plugin(profile, base.Handle);
+                initPlugin();
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message, "Plugin", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
 
-        private void initPlugin(Plugin plugin) {
+        private void initPlugin() {
             try {
                 if (plugin != null) {
-                    this.rows = 10;
-                    this.buttonl = 10;
-                    this.buttont = 10;
-                    this.buttonw = 200;
-                    this.buttonh = 0x19;
-                    this.interval = 30;
-                    this.Text = plugin.title + " " + plugin.version;
-                    this.PluginVer.Text = "PluginVer: " + plugin.version;
-                    this.GameVer.Text = "GameVer: " + plugin.gamever;
-                    this.pluginMem.Clear();
+                    rows = 10;
+                    buttonl = 10;
+                    buttont = 10;
+                    buttonw = 200;
+                    buttonh = 0x19;
+                    interval = 30;
+                    Text = plugin.title + " " + plugin.version;
+                    PluginVer.Text = "PluginVer: " + plugin.version;
+                    GameVer.Text = "GameVer: " + plugin.gamever;
+                    pluginMem.Clear();
                     foreach (PluginItem item in plugin.plugins.Values) {
                         Dictionary<string, uint> dictionary;
                         plugin.read(item.dictKey, out dictionary);
-                        this.pluginMem.Add(item.dictKey, dictionary);
-                        this.addButton(item);
+                        pluginMem.Add(item.dictKey, dictionary);
+                        addButton(item);
                     }
                 }
             } catch (Exception ex) {
@@ -153,14 +140,33 @@ namespace Doffish {
             }
         }
 
+        private void closePlugin() {
+            try {
+                panel1.Controls.Clear();
+                plugin.Close();
+                plugin = null;
+                Text = "Plugin";
+                PluginVer.Text = "PluginVer";
+                GameVer.Text = "GameVer";
+            } catch {
+            }
+        }
+
         private void OpenMenuItem_Click(object sender, EventArgs e) {
+            if (plugin != null) {
+                if (MessageBox.Show("是否关闭当前配置文件", "Plugin",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question,MessageBoxDefaultButton.Button2) != DialogResult.Yes)
+                    return;
+                closePlugin();
+            }
+
             OpenFileDialog dialog = new OpenFileDialog {
                 Filter = "Plug文件|*.plug|Json文件|*.json|所有文件|*.*",
                 RestoreDirectory = true,
                 FilterIndex = 1
             };
             if (dialog.ShowDialog() == DialogResult.OK) {
-                this.initPlugin(dialog.FileName);
+                initPlugin(dialog.FileName);
             }
         }
 
@@ -168,23 +174,23 @@ namespace Doffish {
             Dictionary<string, uint> dictionary;
             string plugin = ((Label)sender).Tag.ToString();
             this.plugin.realize(plugin, out dictionary);
-            this.panel1.Controls[plugin].Text = this.plugin.plugins[plugin].verify;
-            this.panel1.Controls[plugin].ForeColor = this.GetColor(this.plugin.plugins[plugin].verify);
+            panel1.Controls[plugin].Text = this.plugin.plugins[plugin].verify;
+            panel1.Controls[plugin].ForeColor = GetColor(this.plugin.plugins[plugin].verify);
         }
 
         private void RefreshMenuItem_Click(object sender, EventArgs e) {
             try {
-                this.panel1.Controls.Clear();
-                this.initPlugin(this.plugin);
+                panel1.Controls.Clear();
+                initPlugin();
             } catch {
             }
         }
 
         private void ReloadMenuItem_Click(object sender, EventArgs e) {
             try {
-                this.panel1.Controls.Clear();
-                this.plugin.reload();
-                this.initPlugin(this.plugin);
+                panel1.Controls.Clear();
+                plugin.reload();
+                initPlugin();
             } catch {
             }
         }
@@ -219,9 +225,9 @@ namespace Doffish {
                 Dictionary<string, uint> dictionary;
                 string str;
                 int hotkey = msg.WParam.ToInt32();
-                this.plugin.realize(hotkey, out dictionary, out str);
-                this.panel1.Controls[str].Text = this.plugin.plugins[str].verify;
-                this.panel1.Controls[str].ForeColor = this.GetColor(this.plugin.plugins[str].verify);
+                plugin.realize(hotkey, out dictionary, out str);
+                panel1.Controls[str].Text = plugin.plugins[str].verify;
+                panel1.Controls[str].ForeColor = GetColor(plugin.plugins[str].verify);
             }
             base.WndProc(ref msg);
         }
