@@ -98,22 +98,22 @@
                     "address":"0x13896A1"
                 },
                 {
-                    "dictKey":"LevelKeys",
+                    "dictKey":"levelKeys",
                     "module":"TreasureHunt.dll",
                     "address":"0x1377BF0"
                 },
                 {
-                    "dictKey":"LevelArrow",
+                    "dictKey":"levelArrow",
                     "module":"TreasureHunt.dll",
                     "address":"0x1377C20"
                 },
                 {
-                    "dictKey":"LevelKnife",
+                    "dictKey":"levelKnife",
                     "module":"TreasureHunt.dll",
                     "address":"0x1377C07"
                 },
                 {
-                    "dictKey":"LevelClover",
+                    "dictKey":"levelClover",
                     "module":"TreasureHunt.dll",
                     "address":"0x1377C39"
                 },
